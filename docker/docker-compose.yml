@@ -222,9 +222,10 @@ services:
     restart: always
     image: pgvector/pgvector:pg18
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql
     environment:
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=formbricks
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres || exit 1"]
       interval: 5s
@@ -321,7 +322,7 @@ services:
       - ./cube/cube.js:/cube/conf/cube.js:ro
       - ./cube/schema:/cube/conf/model:ro
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:4000/readyz"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/readyz', (res) => res.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 12
